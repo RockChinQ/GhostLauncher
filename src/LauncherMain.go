@@ -11,41 +11,46 @@ import (
 	"strconv"
 	"strings"
 )
+
 var ip string
+
 func main() {
 	fmt.Println("Starting launcher")
-	if !Exists("launcher.ini"){
-		Write1("launcher.ini","39.100.5.139")
+	if !Exists("launcher.ini") {
+		Write1("launcher.ini", "39.100.5.139")
 	}
-	if !Exists("nowVer.txt"){
-		Write1("nowVer.txt","0")
+	if !Exists("nowVer.txt") {
+		Write1("nowVer.txt", "0")
 	}
 	//读取local当前版本号
-	f,err:=ioutil.ReadFile("launcher.ini")
-	if(err!=nil){
+	f, err := ioutil.ReadFile("launcher.ini")
+	if err != nil {
 		panic(err)
 	}
-	filesParam:=strings.Split(string(f)," ")
-	ip=filesParam[0]
+	filesParam := strings.Split(string(f), " ")
+	ip = filesParam[0]
 	//name=filesParam[1]
-	fmt.Println("config:",ip)
+	fmt.Println("config:", ip)
 
-	if len(os.Args)==1{
+	if len(os.Args) == 1 {
 		//写出reg文件
-		Write1("greg.reg","Windows Registry Editor Version 5.00\n\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run]\n\"ghost\"=\"D:\\\\ProgramData\\\\Ghost\\\\lgl.bat\"\n\n")
-		Write1("lgl.bat","title booting\n@echo off\nD:\ncd D:\\ProgramData\\Ghost\ngl.exe")
-		if !Exists("nowVer.txt"){
-			Write1("nowVer.txt","0")
+		Write1("greg.reg", "Windows Registry Editor Version 5.00\n\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run]\n\"ghost\"=\"D:\\\\ProgramData\\\\Ghost\\\\lgl.bat\"\n\n")
+		Write1("lgl.bat", "title booting\n@echo off\nD:\ncd D:\\ProgramData\\Ghost\ngl.exe")
+		if !Exists("nowVer.txt") {
+			Write1("nowVer.txt", "0")
 		}
 
 		if !Exists("jre.zip") {
 			downloadFile("http://"+ip+"/ghost/jre.zip", "jre.zip")
 			unzip("jre.zip")
+			Write1("lib\\i386\\jvm.cfg", "# Copyright (c) 2001, 2013, Oracle and/or its affiliates. All rights reserved.\n# ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n# List of JVMs that can be used as an option to java, javac, etc.\n# Order is important -- first in this list is the default JVM.\n# NOTE that this both this file and its format are UNSUPPORTED and\n# WILL GO AWAY in a future release.\n#\n# You may also select a JVM in an arbitrary location with the\n# \"-XXaltjvm=<jvm_dir>\" option, but that too is unsupported\n# and may not be available in a future release.\n#\n-client KNOWN\n-server KNOWN\n")
+
 		}
+
 		updateClient()
 		run()
 	}
-	if os.Args[1]=="install"{
+	if os.Args[1] == "install" {
 		//res,err:=http.Get("http://"+ip+"/ghost/jre.zip")
 		//if(err!=nil){
 		//	panic(err)
@@ -55,67 +60,69 @@ func main() {
 		//	panic(err)
 		//}
 		//io.Copy(f,res.Body)
-		if !Exists("nowVer.txt"){
-			Write1("nowVer.txt","0")
+		if !Exists("nowVer.txt") {
+			Write1("nowVer.txt", "0")
 		}
 
 		if !Exists("jre.zip") {
 			downloadFile("http://"+ip+"/ghost/jre.zip", "jre.zip")
 		}
 		unzip("jre.zip")
+		Write1("lib\\i386\\jvm.cfg", "# Copyright (c) 2001, 2013, Oracle and/or its affiliates. All rights reserved.\n# ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n#\n# List of JVMs that can be used as an option to java, javac, etc.\n# Order is important -- first in this list is the default JVM.\n# NOTE that this both this file and its format are UNSUPPORTED and\n# WILL GO AWAY in a future release.\n#\n# You may also select a JVM in an arbitrary location with the\n# \"-XXaltjvm=<jvm_dir>\" option, but that too is unsupported\n# and may not be available in a future release.\n#\n-client KNOWN\n-server KNOWN\n")
 
 		updateClient()
 		run()
-	}else if os.Args[1]=="launch"{
+	} else if os.Args[1] == "launch" {
 		updateClient()
 		run()
 	}
 
 }
+
 //func run(){
 //	go run0()
 //	os.Exit(0)
 //}
-func run(){
-	c:=exec.Command("bin\\javaw.exe","-jar","ghostjc.jar")
+func run() {
+	c := exec.Command("bin\\javaw.exe", "-jar", "ghostjc.jar")
 	if err := c.Start(); err != nil {
 		panic(err)
 		//fmt.Println("Error: ", err)
 	}
 	os.Exit(0)
 }
-func updateClient(){
+func updateClient() {
 
 	//效验客户端版本
 	//读取现在的版本号
-	ver,err:=ioutil.ReadFile("nowVer.txt")
-	if(err!=nil){
+	ver, err := ioutil.ReadFile("nowVer.txt")
+	if err != nil {
 		panic(err)
 	}
-	verid,err:=strconv.Atoi(strings.ReplaceAll(string(ver),"\n",""))
-	if(err!=nil){
+	verid, err := strconv.Atoi(strings.ReplaceAll(string(ver), "\n", ""))
+	if err != nil {
 		panic(err)
 	}
 	//读取最新版本号
-	downloadFile("http://"+ip+"/ghost/client/version.txt","latestVer.txt")
-	verla,err:=ioutil.ReadFile("latestVer.txt")
-	if(err!=nil){
+	downloadFile("http://"+ip+"/ghost/client/version.txt", "latestVer.txt")
+	verla, err := ioutil.ReadFile("latestVer.txt")
+	if err != nil {
 		panic(err)
 	}
-	veridla,err:=strconv.Atoi(strings.ReplaceAll(string(verla),"\n",""))
-	if(err!=nil){
+	veridla, err := strconv.Atoi(strings.ReplaceAll(string(verla), "\n", ""))
+	if err != nil {
 		panic(err)
 	}
 	//下载客户端
 	//校验
-	if veridla>verid{
+	if veridla > verid {
 		fmt.Println("updating client")
-		downloadFile("http://"+ip+"/ghost/client/"+strconv.Itoa(veridla)+".jar","ghostjc.jar")
-		downloadFile("http://"+ip+"/ghost/client/ghostjc.ini","ghostjc.ini")
-		Write1("nowVer.txt",strconv.Itoa(veridla))
+		downloadFile("http://"+ip+"/ghost/client/"+strconv.Itoa(veridla)+".jar", "ghostjc.jar")
+		downloadFile("http://"+ip+"/ghost/client/ghostjc.ini", "ghostjc.ini")
+		Write1("nowVer.txt", strconv.Itoa(veridla))
 	}
 }
-func unzip(filename string){
+func unzip(filename string) {
 	r, err := zip.OpenReader(filename)
 	if err != nil {
 		fmt.Println(err)
@@ -145,20 +152,20 @@ func unzip(filename string){
 		NewFile.Close()
 	}
 }
-func downloadFile(url string,target string){
+func downloadFile(url string, target string) {
 
-	res,err:=http.Get(url)
-	if(err!=nil){
+	res, err := http.Get(url)
+	if err != nil {
 		panic(err)
 	}
-	f,err:=os.Create(target)
-	if err!=nil{
+	f, err := os.Create(target)
+	if err != nil {
 		panic(err)
 	}
-	io.Copy(f,res.Body)
+	io.Copy(f, res.Body)
 }
 func Exists(path string) bool {
-	_, err := os.Stat(path)    //os.Stat获取文件信息
+	_, err := os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
 		if os.IsExist(err) {
 			return true
@@ -167,7 +174,7 @@ func Exists(path string) bool {
 	}
 	return true
 }
-func Write1(fileName string,str string)  {
+func Write1(fileName string, str string) {
 	//fileName := "file/test2"
 	//strTest := "测试测试"
 	var d = []byte(str)
