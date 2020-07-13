@@ -97,11 +97,12 @@ func updateClient() {
 	//读取现在的版本号
 	ver, err := ioutil.ReadFile("nowVer.txt")
 	if err != nil {
-		panic(err)
+		//panic(err)
+		return
 	}
 	verid, err := strconv.Atoi(strings.ReplaceAll(string(ver), "\n", ""))
 	if err != nil {
-		panic(err)
+		return
 	}
 	//读取最新版本号
 	downloadFile("http://"+ip+"/ghost/client/version.txt", "latestVer.txt")
@@ -111,6 +112,7 @@ func updateClient() {
 	}
 	veridla, err := strconv.Atoi(strings.ReplaceAll(string(verla), "\n", ""))
 	if err != nil {
+		return
 		panic(err)
 	}
 	//下载客户端
@@ -118,7 +120,9 @@ func updateClient() {
 	if veridla > verid {
 		fmt.Println("updating client")
 		downloadFile("http://"+ip+"/ghost/client/"+strconv.Itoa(veridla)+".jar", "ghostjc.jar")
-		downloadFile("http://"+ip+"/ghost/client/ghostjc.ini", "ghostjc.ini")
+		if !Exists("ghostjc.ini") {
+			downloadFile("http://"+ip+"/ghost/client/ghostjc.ini", "ghostjc.ini")
+		}
 		Write1("nowVer.txt", strconv.Itoa(veridla))
 	}
 }
@@ -156,11 +160,13 @@ func downloadFile(url string, target string) {
 
 	res, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		return
+		//panic(err)
 	}
 	f, err := os.Create(target)
 	if err != nil {
-		panic(err)
+		return
+		//panic(err)
 	}
 	io.Copy(f, res.Body)
 }
